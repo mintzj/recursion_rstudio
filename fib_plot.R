@@ -17,7 +17,7 @@ fib <- function(n) {
 }
 
 
-info <- rstack()
+info <- rstack() # a simple thing to store rows in
 
 for(i in seq(1,15)) {
   CALL_COUNTER <<- 0

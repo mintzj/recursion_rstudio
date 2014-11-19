@@ -1,5 +1,6 @@
 library(stringr)
-
+library(ggplot2)
+library(rstackdeque)
 
 fib <- function(n) {
   CALL_COUNTER <<- CALL_COUNTER + 1
@@ -15,8 +16,6 @@ fib <- function(n) {
   }
 }
 
-library(ggplot2)
-library(rstackdeque)
 
 info <- rstack()
 

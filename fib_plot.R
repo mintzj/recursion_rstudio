@@ -2,23 +2,34 @@ library(stringr)
 library(ggplot2)
 library(rstackdeque)
 
+## NOW IS MEMOIZED!
+
+FIB_CACHE <<- hash()
+
 fib <- function(n) {
   CALL_COUNTER <<- CALL_COUNTER + 1
   thiscall <- str_c("fib:n=", as.character(n))
+  if(has.key(thiscall, FIB_CACHE)) {
+    return(FIB_CACHE[[thiscall]])
+  }
+  
   CALL_STACK <<- insert_top(CALL_STACK, thiscall)
   #print_string_stack(CALL_STACK)
   if(n == 1) {
     CALL_STACK <<- without_top(CALL_STACK)
     #print_string_stack(CALL_STACK)
+    FIB_CACHE[[thiscall]] <<- 1
     return(1)
   } else if(n == 2) {
     CALL_STACK <<- without_top(CALL_STACK)
     #print_string_stack(CALL_STACK)
+    FIB_CACHE[[thiscall]] <<- 1
     return(1)
   } else {
     a <- fib(n-1)
     b <- fib(n-2)
     c <- a + b
+    FIB_CACHE[[thiscall]] <<- c
     CALL_STACK <<- without_top(CALL_STACK)
     #print_string_stack(CALL_STACK)
     return(c)

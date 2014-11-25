@@ -23,8 +23,8 @@ unvec_char <- function(a) {
   return(ret)
 }
 
-## given two char vectors of equal length (e.g. c("A", "T", "G") and c("A", "-", "G"),
-## returns their score (e.g. 0, -3, or 4, or whatever))
+## given two char vectors of equal length (e.g. c("A", "T", "G") 
+## and c("A", "-", "G"), returns their score (e.g. 0, -3, or 4, or whatever))
 score_aln <- function(xin, yin) {
   if(length(xin) != length(yin)) {
     stop("Can't score two sequences of unequal length. We die.")
@@ -51,17 +51,17 @@ score_aln <- function(xin, yin) {
 ## and check to see if they can be a base-case; if so returns an answer list
 base_case <- function(xin, yin) {
   # die if this doesn't look like a base case
-  if(length(xin) >= 1 & length(yin) > 1) {
-    stop("This isn't a base case. We die.")  
-  } else if(length(yin) >= 1 & length(xin) > 1) {
-    stop("This isn't a base case either! We die.")
-        
+  if(      ) {
+    stop("Doesn't look like a base case. We die.")    
   
   # return an answer for the simplest case, both have length one
   } else if(length(xin) == 1 & length(yin) == 1) {
-    answer = list(x = xin, y = yin, xaln = xin, yaln = yin, score = score_aln(xin, yin))
+    answer = list(x = xin, y = yin, 
+                  xaln = xin, yaln = yin, 
+                  score = score_aln(xin, yin))
     return(answer)
-    
+ 
+
   # if x is of length 0, pad it out and return the answer
   } else if(length(yin) == 0) {
     xaligned <- xin
@@ -69,18 +69,18 @@ base_case <- function(xin, yin) {
     for(i in seq(1,length(xin))) {
       yaligned <- c(yaligned, "-")
     }
-    answer = list(x = xin, y = yin, xaln = xaligned, yaln = yaligned, score = score_aln(xaligned, yaligned))
+    answer = list(x = xin, y = yin, 
+                  xaln = xaligned, yaln = yaligned, 
+                  score = score_aln(xaligned, yaligned))
     return(answer)
     
   # if y is of length 0, pad it out and return the answer
-  } else if(length(y) == 0) {
+  } else if(length(xin) == 0) {
     # TODO: do the remaining base case
     
-    
-  # this shouldn't happen:
-  } else {
-    stop("How did you even get here? We die.") 
-  }
+  } 
+   # this shouldn't happen:
+  stop("How did you even get here? One of the cases should have happend. Die.") 
   
 }
 

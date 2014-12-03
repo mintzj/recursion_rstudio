@@ -87,7 +87,6 @@ base_case <- function(xin, yin) {
     answer = list(x = xin, y = yin, 
                   xaln = xaligned, yaln = yaligned, 
                   score = score_aln(xaligned, yaligned))
-                  #fromx = xin, fromy = yin)
     return(answer)
     
   } 

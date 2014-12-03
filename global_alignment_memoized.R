@@ -23,6 +23,7 @@ unvec_char <- function(a) {
   return(ret)
 }
 
+
 ## given two char vectors of equal length (e.g. c("A", "T", "G") 
 ## and c("A", "-", "G"), returns their score (e.g. 0, -3, or 4, or whatever))
 score_aln <- function(xin, yin) {
@@ -51,7 +52,7 @@ score_aln <- function(xin, yin) {
 ## and check to see if they can be a base-case; if so returns an answer list
 base_case <- function(xin, yin) {
   # die if this doesn't look like a base case
-  if( TODO: what defines a non-base-case? ) { 
+  if((length(xin) > 1 & length(yin) >= 1) | (length(xin) >=1 & length(yin) > 1) ) { 
     stop("Doesn't look like a base case. We die.")    
   
   # return an answer for the simplest case, both have length one
@@ -76,7 +77,15 @@ base_case <- function(xin, yin) {
     
   # if y is of length 0, pad it out and return the answer
   } else if(length(xin) == 0) {
-    # TODO: do the remaining base case
+    xaligned <- c()
+    yaligned <- yin
+    for(i in seq(1,length(yin))) {
+      xaligned <- c(xaligned, "-")
+    }
+    answer = list(x = xin, y = yin, 
+                  xaln = xaligned, yaln = yaligned, 
+                  score = score_aln(xaligned, yaligned))
+    return(answer)
     
   } 
    # this shouldn't happen:
@@ -84,35 +93,67 @@ base_case <- function(xin, yin) {
   
 }
 
+ALN_CACHE <<- hash()
+global_aln <- function(x, y) {
+  thiscall <- str_c(unvec_char(x), ",", unvec_char(y))
+  if(has.key(thiscall, ALN_CACHE)) {
+    return(ALN_CACHE[[thiscall]])
+  }
+  
+  if(length(x) == 0 | length(y) == 0 | (length(x) == 1 & length(y) == 1)) {
+    ALN_CACHE[[thiscall]] <<- base_case(x,y)
+   return(ALN_CACHE[[thiscall]])
+  #return(base_case(x,y))
+  }
+  
+  px <- x[1:length(x) - 1]
+  ex <- x[length(x)]
+  py <- y[1:length(y) - 1]
+  ey <- y[length(y)]
+
+  
+  A <- global_aln(px, py)
+  B <- global_aln(c(px, ex), py)
+  C <- global_aln(px, c(py, ey))
+  
+  answera <- list(x = x, y = y, 
+                  xaln = c(A[["xaln"]], ex), 
+                  yaln = c(A[["yaln"]], ey), 
+                  score = A[["score"]] + score_aln(ex, ey))
+  answerb <- list(x = x, y = y, 
+                  xaln = c(B[["xaln"]], "-"), 
+                  yaln = c(B[["yaln"]], ey),
+                  score = B[["score"]] + score_aln("-", ey))
+  answerc <- list(x = x, y = y, 
+                  xaln = c(C[["xaln"]], ex), 
+                  yaln = c(C[["yaln"]], "-"),
+                  score = C[["score"]] + score_aln(ex, "-"))
+  
+  ## return the best of the three
+  bestanswer <- answera
+  bestscore <- answera[["score"]]
+  if(answerb[["score"]] > bestscore) {
+    bestanswer <- answerb
+    bestscore <- answerb[["score"]]
+  }
+  if(answerc[["score"]] > bestscore) {
+    bestanswer <- answerc
+    bestscore <- answerc[["score"]]
+  }
+  
+  ALN_CACHE[[thiscall]] <<- bestanswer
+  return(bestanswer)
+}
 
 
-### We're going to format an "answer" as list, with in the input and the output
-### specified, as well as the storing the score
-answer <- list(x = c("T", "A", "C"), 
-               y = c("T", "G"), 
-               xaln = c("T", "A", "C"), 
-               yaln = c("T", "-", "G"),
-               score = -5)
 
 
-### Checking a base case
-xpre <- "TAC"
-ypre <- ""
-x <- char_vec(xpre)
-y <- char_vec(ypre)
-
-base_case_answer_1 <- base_case(x, y)
-print(base_case_answer_1)
 
 
-### Checking another base case
-xpre <- "T"
-ypre <- "A"
-x <- char_vec(xpre)
-y <- char_vec(ypre)
 
-base_case_answer_2 <- base_case(x, y)
-print(base_case_answer_2)
-
-
+# do iiiiit
+x <- char_vec("TATCGGACTG")
+y <- char_vec("TCTGGTCCCTA")
+answer <- global_aln(x, y)
+print(answer)
 

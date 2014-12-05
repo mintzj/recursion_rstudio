@@ -61,7 +61,8 @@ base_case <- function(xin, yin) {
   } else if(length(xin) == 1 & length(yin) == 1) {
     answer = list(x = xin, y = yin, 
                   xaln = xin, yaln = yin, 
-                  score = score_aln(xin, yin))
+                  score = score_aln(xin, yin),
+                  fromx = xin, fromy = yin)
     return(answer)
  
 
@@ -74,7 +75,8 @@ base_case <- function(xin, yin) {
     }
     answer = list(x = xin, y = yin, 
                   xaln = xaligned, yaln = yaligned, 
-                  score = score_aln(xaligned, yaligned))
+                  score = score_aln(xaligned, yaligned),
+                  fromx = xin, fromy = yin)
     return(answer)
     
   # if y is of length 0, pad it out and return the answer
@@ -86,7 +88,8 @@ base_case <- function(xin, yin) {
     }
     answer = list(x = xin, y = yin, 
                   xaln = xaligned, yaln = yaligned, 
-                  score = score_aln(xaligned, yaligned))
+                  score = score_aln(xaligned, yaligned),
+                  fromx = xin, fromy = yin)
     return(answer)
     
   } 
@@ -133,13 +136,19 @@ global_aln <- function(x, y) {
   ## return the best of the three
   bestanswer <- answera
   bestscore <- answera[["score"]]
+  bestanswer[["fromx"]] <- A[["x"]]
+  bestanswer[["fromy"]] <- A[["y"]]
   if(answerb[["score"]] > bestscore) {
     bestanswer <- answerb
     bestscore <- answerb[["score"]]
+    bestanswer[["fromx"]] <- B[["x"]]
+    bestanswer[["fromy"]] <- B[["y"]]
   }
   if(answerc[["score"]] > bestscore) {
     bestanswer <- answerc
     bestscore <- answerc[["score"]]
+    bestanswer[["fromx"]] <- C[["x"]]
+    bestanswer[["fromy"]] <- C[["y"]]
   }
   
   ALN_CACHE[[thiscall]] <<- bestanswer
@@ -173,8 +182,8 @@ hash_vals_to_df <- function(thehash) {
 
 
 # do iiiiit
-x <- char_vec("TATCGGTCTA")
-y <- char_vec("TCTGG")
+x <- char_vec("TATCTGCAACGA")
+y <- char_vec("TTGTGC")
 answer <- global_aln(x, y)
 print(answer)
 
@@ -187,6 +196,10 @@ print(head(cache_df))
 p <- ggplot(cache_df) +
   geom_tile(aes(x = reorder(x, nchar(x)), y = reorder(y, -1*nchar(y)), fill = score)) +
   geom_text(aes(x = reorder(x, nchar(x)), y = reorder(y, -1*nchar(y)), label = score)) +
+  geom_segment(aes(x = x, y = y, xend = fromx, yend = fromy),
+               arrow = arrow(length = unit(0.2, "cm"), type = "closed"),
+               position = position_jitter(width = 0.1, height = 0.1),
+               color = "red") +
   theme_bw(16) +
   theme(axis.text.x = element_text(angle = 35, hjust = 1)) +
   coord_equal()

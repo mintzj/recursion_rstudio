@@ -151,6 +151,20 @@ draw_sentence(sentence, 5, 30, 30)
 
 ################################
 
+sentence <- "X"
+rules <- hash()
+rules[["X"]] <- char_vec("F-[[X]+X]+F[+FX]-X")
+rules$"F" <- c("F", "F")
+for(i in seq(1,5)) {
+  sentence <- lproduce(sentence, rules)
+}
+
+turtle_init(mode = "clip")
+turtle_hide()
+turtle_setstate(c(50,0,0))  # x, y, angle
+
+draw_sentence(sentence, 1, 20, 25)
+
 
 
 
